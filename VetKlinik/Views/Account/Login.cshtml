@@ -1,0 +1,55 @@
+﻿@model VetKlinik.ViewModels.LoginViewModel
+@{
+    ViewData["Title"] = "Giriş Yap";
+}
+
+<div class="auth-wrapper">
+    <div class="auth-card row g-0">
+        <!-- Sol: renkli tanıtım paneli -->
+        <div class="col-md-5 auth-side d-none d-md-flex">
+            <div>
+                <div class="auth-paw">🐾</div>
+                <h2>Tekrar hoş geldiniz!</h2>
+                <p>Evcil dostlarınızın randevularını, aşı takvimini ve muayene geçmişini tek yerden yönetin.</p>
+            </div>
+        </div>
+
+        <!-- Sağ: giriş formu -->
+        <div class="col-md-7 auth-form">
+            <h3 class="mb-1">Giriş Yap</h3>
+            <p class="text-muted mb-4">Hesabınıza giriş yapın</p>
+
+            <form asp-action="Login" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2" role="alert"></div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="Email" class="form-control" placeholder="ornek@mail.com" autocomplete="username" />
+                    <label asp-for="Email"></label>
+                    <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="Password" class="form-control" placeholder="Şifre" autocomplete="current-password" />
+                    <label asp-for="Password"></label>
+                    <span asp-validation-for="Password" class="text-danger small"></span>
+                </div>
+
+                <div class="form-check mb-4">
+                    <input asp-for="RememberMe" class="form-check-input" />
+                    <label asp-for="RememberMe" class="form-check-label"></label>
+                </div>
+
+                <button type="submit" class="btn btn-vet w-100 py-2">Giriş Yap</button>
+            </form>
+
+            <p class="text-center mt-4 mb-0">
+                Hesabınız yok mu?
+                <a asp-action="Register" class="link-vet fw-semibold">Kayıt olun</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

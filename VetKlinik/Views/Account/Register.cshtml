@@ -1,0 +1,67 @@
+﻿@model VetKlinik.ViewModels.RegisterViewModel
+@{
+    ViewData["Title"] = "Kayıt Ol";
+}
+
+<div class="auth-wrapper">
+    <div class="auth-card row g-0">
+        <!-- Sol: renkli tanıtım paneli -->
+        <div class="col-md-5 auth-side d-none d-md-flex">
+            <div>
+                <div class="auth-paw">🐶🐱</div>
+                <h2>Aramıza katılın</h2>
+                <p>Üye olun; evcil hayvanlarınızı kaydedin, uygun hekimden kolayca randevu alın.</p>
+            </div>
+        </div>
+
+        <!-- Sağ: kayıt formu -->
+        <div class="col-md-7 auth-form">
+            <h3 class="mb-1">Kayıt Ol</h3>
+            <p class="text-muted mb-4">Yeni bir hesap oluşturun</p>
+
+            <form asp-action="Register" method="post">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2" role="alert"></div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="FullName" class="form-control" placeholder="Ad Soyad" autocomplete="name" />
+                    <label asp-for="FullName"></label>
+                    <span asp-validation-for="FullName" class="text-danger small"></span>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="Email" class="form-control" placeholder="ornek@mail.com" autocomplete="username" />
+                    <label asp-for="Email"></label>
+                    <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+
+                <div class="row g-2">
+                    <div class="col-sm-6">
+                        <div class="form-floating mb-3">
+                            <input asp-for="Password" class="form-control" placeholder="Şifre" autocomplete="new-password" />
+                            <label asp-for="Password"></label>
+                            <span asp-validation-for="Password" class="text-danger small"></span>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-floating mb-3">
+                            <input asp-for="ConfirmPassword" class="form-control" placeholder="Şifre (Tekrar)" autocomplete="new-password" />
+                            <label asp-for="ConfirmPassword"></label>
+                            <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-vet w-100 py-2 mt-2">Kayıt Ol</button>
+            </form>
+
+            <p class="text-center mt-4 mb-0">
+                Zaten hesabınız var mı?
+                <a asp-action="Login" class="link-vet fw-semibold">Giriş yapın</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

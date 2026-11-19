@@ -1,5 +1,20 @@
+/* ============================================================
+   VetKlinik teması: lacivert + mor
+   Renkleri değiştirmek için sadece aşağıdaki değişkenleri düzenleyin.
+   ============================================================ */
+:root {
+  --vet-lacivert: #1b1f4b;
+  --vet-lacivert-acik: #2d3478;
+  --vet-mor: #6f42c1;
+  --vet-mor-acik: #9b6dff;
+  --vet-zemin: #f5f3fc;
+  --vet-gecis: linear-gradient(135deg, var(--vet-lacivert) 0%, var(--vet-mor) 100%);
+}
+
 html {
   font-size: 14px;
+  position: relative;
+  min-height: 100%;
 }
 
 @media (min-width: 768px) {
@@ -8,17 +23,23 @@ html {
   }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
-}
-
 body {
   margin-bottom: 60px;
+  background-color: var(--vet-zemin);
+}
+
+/* Bootstrap'in mavi odak çerçevesini mora çevir */
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem rgba(111, 66, 193, .5);
+}
+
+.form-control:focus {
+  border-color: var(--vet-mor-acik);
+}
+
+.form-check-input:checked {
+  background-color: var(--vet-mor);
+  border-color: var(--vet-mor);
 }
 
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
@@ -28,4 +49,112 @@ body {
 
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
+}
+
+/* ---------- Genel yardımcı sınıflar ---------- */
+a {
+  color: var(--vet-mor);
+}
+
+.text-vet {
+  color: var(--vet-lacivert) !important;
+}
+
+.link-vet {
+  color: var(--vet-mor);
+  text-decoration: none;
+}
+
+.link-vet:hover {
+  color: var(--vet-lacivert);
+  text-decoration: underline;
+}
+
+/* Ana buton: lacivert-mor geçişli */
+.btn-vet {
+  background: var(--vet-gecis);
+  color: #fff;
+  border: none;
+  font-weight: 600;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.btn-vet:hover, .btn-vet:focus {
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 .5rem 1rem rgba(111, 66, 193, .35);
+}
+
+/* ---------- Üst menü ---------- */
+.navbar-vet {
+  background: var(--vet-gecis);
+  box-shadow: 0 .25rem 1rem rgba(27, 31, 75, .25);
+}
+
+.navbar-vet .nav-link {
+  color: rgba(255, 255, 255, .85);
+}
+
+.navbar-vet .nav-link:hover {
+  color: #fff;
+}
+
+/* ---------- Alt bilgi ---------- */
+.footer-vet {
+  background-color: var(--vet-lacivert);
+  color: rgba(255, 255, 255, .7);
+}
+
+.footer-vet a {
+  color: var(--vet-mor-acik);
+}
+
+/* ---------- Ana sayfa karşılama alanı ---------- */
+.hero-vet {
+  background: var(--vet-gecis);
+  border-radius: 1.25rem;
+  padding: 4rem 1.5rem;
+  box-shadow: 0 1rem 2rem rgba(27, 31, 75, .2);
+}
+
+/* ---------- Giriş / Kayıt sayfaları ---------- */
+.auth-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 70vh;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 900px;
+  background: #fff;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  box-shadow: 0 1rem 2.5rem rgba(27, 31, 75, .15);
+}
+
+.auth-side {
+  background: var(--vet-gecis);
+  color: #fff;
+  padding: 3rem 2.5rem;
+  align-items: center;
+}
+
+.auth-side h2 {
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.auth-side p {
+  color: rgba(255, 255, 255, .85);
+}
+
+.auth-paw {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.auth-form {
+  padding: 3rem 2.5rem;
 }
