@@ -21,6 +21,10 @@ namespace VetKlinik.Data
         public DbSet<Specialty> Specialties => Set<Specialty>();
         public DbSet<Veterinarian> Veterinarians => Set<Veterinarian>();
         public DbSet<VetAvailability> VetAvailabilities => Set<VetAvailability>();
+        public DbSet<Pet> Pets => Set<Pet>();
+        public DbSet<Vaccination> Vaccinations => Set<Vaccination>();
+        public DbSet<Appointment> Appointments => Set<Appointment>();
+        public DbSet<ExaminationNote> ExaminationNotes => Set<ExaminationNote>();
 
         // Attribute'larla ifade edilemeyen ayarlar (ilişkiler, silme davranışları, indeksler) burada yapılır
         protected override void OnModelCreating(ModelBuilder builder)
@@ -95,6 +99,68 @@ namespace VetKlinik.Data
                 .HasOne(a => a.Veterinarian)
                 .WithMany(v => v.Availabilities)
                 .HasForeignKey(a => a.VeterinarianId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // ---------- Evcil Hayvan ----------
+            builder.Entity<Pet>()
+                .Property(p => p.Weight)
+                .HasPrecision(6, 2);
+
+            // Evcil hayvanı olan bir kullanıcı hesabı yanlışlıkla silinemesin
+            builder.Entity<Pet>()
+                .HasOne(p => p.Owner)
+                .WithMany()
+                .HasForeignKey(p => p.OwnerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ---------- Aşı ----------
+            // Hayvan silinirse aşı kayıtları da silinsin
+            builder.Entity<Vaccination>()
+                .HasOne(v => v.Pet)
+                .WithMany(p => p.Vaccinations)
+                .HasForeignKey(v => v.PetId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // ---------- Randevu ----------
+            builder.Entity<Appointment>()
+                .Property(a => a.Price)
+                .HasPrecision(10, 2);
+
+            // Durum veritabanında sayı yerine okunabilir metin olarak saklansın ("Bekliyor", "Onaylandi" ...)
+            builder.Entity<Appointment>()
+                .Property(a => a.Status)
+                .HasConversion<string>()
+                .HasMaxLength(20);
+
+            // Randevu geçmişi korunmalı: randevusu olan hayvan, hekim veya hizmet silinemez
+            builder.Entity<Appointment>()
+                .HasOne(a => a.Pet)
+                .WithMany(p => p.Appointments)
+                .HasForeignKey(a => a.PetId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Appointment>()
+                .HasOne(a => a.Veterinarian)
+                .WithMany()
+                .HasForeignKey(a => a.VeterinarianId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Appointment>()
+                .HasOne(a => a.Service)
+                .WithMany()
+                .HasForeignKey(a => a.ServiceId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Çakışma kontrolü "bu hekimin bu saatlerdeki randevuları" diye sorgulanacağı için indeks
+            builder.Entity<Appointment>()
+                .HasIndex(a => new { a.VeterinarianId, a.StartTime });
+
+            // ---------- Muayene Notu ----------
+            // Bire-bir: her randevunun en fazla bir muayene notu olur; randevu silinirse not da silinir
+            builder.Entity<ExaminationNote>()
+                .HasOne(n => n.Appointment)
+                .WithOne(a => a.ExaminationNote)
+                .HasForeignKey<ExaminationNote>(n => n.AppointmentId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

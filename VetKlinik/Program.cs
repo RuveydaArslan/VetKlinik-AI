@@ -69,6 +69,13 @@ app.UseAuthorization();  // bu sayfaya girebilir mi? (yetki kontrolü)
 
 app.MapStaticAssets();
 
+// Area'lar için rota: /Admin/Dashboard, /Vet/Dashboard ...
+// (default rotadan ÖNCE tanımlanmalı)
+app.MapControllerRoute(
+    name: "areas",
+    pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}")
+    .WithStaticAssets();
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")

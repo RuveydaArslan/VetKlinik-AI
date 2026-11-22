@@ -44,7 +44,23 @@ namespace VetKlinik.Controllers
                 model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
 
             if (sonuc.Succeeded)
+            {
+                // Özel bir sayfadan gelinmediyse kullanıcıyı rolüne göre kendi paneline gönder
+                if (string.IsNullOrEmpty(returnUrl))
+                {
+                    var kullanici = await _userManager.FindByEmailAsync(model.Email);
+                    if (kullanici != null)
+                    {
+                        if (await _userManager.IsInRoleAsync(kullanici, Roles.Admin))
+                            return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
+                        if (await _userManager.IsInRoleAsync(kullanici, Roles.Veteriner))
+                            return RedirectToAction("Index", "Dashboard", new { area = "Vet" });
+                        if (await _userManager.IsInRoleAsync(kullanici, Roles.Uye))
+                            return RedirectToAction("Index", "Panel");
+                    }
+                }
                 return YerelAdreseDon(returnUrl);
+            }
 
             ModelState.AddModelError(string.Empty, "E-posta veya şifre hatalı.");
             return View(model);
@@ -81,7 +97,7 @@ namespace VetKlinik.Controllers
 
                 await _signInManager.SignInAsync(kullanici, isPersistent: false);
                 TempData["Basari"] = "Kaydınız başarıyla oluşturuldu. Hoş geldiniz!";
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Panel");
             }
 
             // Identity hatalarını (ör. e-posta zaten kayıtlı) forma ekle

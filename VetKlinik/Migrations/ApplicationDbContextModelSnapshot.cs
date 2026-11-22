@@ -255,6 +255,63 @@ namespace VetKlinik.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("VetKlinik.Models.Appointment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DurationMinutes")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("EndTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("OwnerNote")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("PetId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Price")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<string>("RejectionReason")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<int>("ServiceId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<int>("VeterinarianId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PetId");
+
+                    b.HasIndex("ServiceId");
+
+                    b.HasIndex("VeterinarianId", "StartTime");
+
+                    b.ToTable("Appointments");
+                });
+
             modelBuilder.Entity("VetKlinik.Models.Clinic", b =>
                 {
                     b.Property<int>("Id")
@@ -322,6 +379,92 @@ namespace VetKlinik.Migrations
                     b.ToTable("ClinicWorkingHours");
                 });
 
+            modelBuilder.Entity("VetKlinik.Models.ExaminationNote", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AppointmentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Complaint")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Diagnosis")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("Treatment")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppointmentId")
+                        .IsUnique();
+
+                    b.ToTable("ExaminationNotes");
+                });
+
+            modelBuilder.Entity("VetKlinik.Models.Pet", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateOnly>("BirthDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Breed")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("OwnerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("PhotoPath")
+                        .HasMaxLength(260)
+                        .HasColumnType("nvarchar(260)");
+
+                    b.Property<string>("Species")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<decimal>("Weight")
+                        .HasPrecision(6, 2)
+                        .HasColumnType("decimal(6,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OwnerId");
+
+                    b.ToTable("Pets");
+                });
+
             modelBuilder.Entity("VetKlinik.Models.Service", b =>
                 {
                     b.Property<int>("Id")
@@ -382,6 +525,39 @@ namespace VetKlinik.Migrations
                         .IsUnique();
 
                     b.ToTable("Specialties");
+                });
+
+            modelBuilder.Entity("VetKlinik.Models.Vaccination", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateOnly>("DateGiven")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("NextDoseDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<int>("PetId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("VaccineName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PetId");
+
+                    b.ToTable("Vaccinations");
                 });
 
             modelBuilder.Entity("VetKlinik.Models.VetAvailability", b =>
@@ -537,6 +713,33 @@ namespace VetKlinik.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("VetKlinik.Models.Appointment", b =>
+                {
+                    b.HasOne("VetKlinik.Models.Pet", "Pet")
+                        .WithMany("Appointments")
+                        .HasForeignKey("PetId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("VetKlinik.Models.Service", "Service")
+                        .WithMany()
+                        .HasForeignKey("ServiceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("VetKlinik.Models.Veterinarian", "Veterinarian")
+                        .WithMany()
+                        .HasForeignKey("VeterinarianId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Pet");
+
+                    b.Navigation("Service");
+
+                    b.Navigation("Veterinarian");
+                });
+
             modelBuilder.Entity("VetKlinik.Models.ClinicWorkingHour", b =>
                 {
                     b.HasOne("VetKlinik.Models.Clinic", "Clinic")
@@ -548,6 +751,28 @@ namespace VetKlinik.Migrations
                     b.Navigation("Clinic");
                 });
 
+            modelBuilder.Entity("VetKlinik.Models.ExaminationNote", b =>
+                {
+                    b.HasOne("VetKlinik.Models.Appointment", "Appointment")
+                        .WithOne("ExaminationNote")
+                        .HasForeignKey("VetKlinik.Models.ExaminationNote", "AppointmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Appointment");
+                });
+
+            modelBuilder.Entity("VetKlinik.Models.Pet", b =>
+                {
+                    b.HasOne("VetKlinik.Models.ApplicationUser", "Owner")
+                        .WithMany()
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Owner");
+                });
+
             modelBuilder.Entity("VetKlinik.Models.Service", b =>
                 {
                     b.HasOne("VetKlinik.Models.Clinic", "Clinic")
@@ -557,6 +782,17 @@ namespace VetKlinik.Migrations
                         .IsRequired();
 
                     b.Navigation("Clinic");
+                });
+
+            modelBuilder.Entity("VetKlinik.Models.Vaccination", b =>
+                {
+                    b.HasOne("VetKlinik.Models.Pet", "Pet")
+                        .WithMany("Vaccinations")
+                        .HasForeignKey("PetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Pet");
                 });
 
             modelBuilder.Entity("VetKlinik.Models.VetAvailability", b =>
@@ -588,6 +824,11 @@ namespace VetKlinik.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("VetKlinik.Models.Appointment", b =>
+                {
+                    b.Navigation("ExaminationNote");
+                });
+
             modelBuilder.Entity("VetKlinik.Models.Clinic", b =>
                 {
                     b.Navigation("Services");
@@ -595,6 +836,13 @@ namespace VetKlinik.Migrations
                     b.Navigation("Veterinarians");
 
                     b.Navigation("WorkingHours");
+                });
+
+            modelBuilder.Entity("VetKlinik.Models.Pet", b =>
+                {
+                    b.Navigation("Appointments");
+
+                    b.Navigation("Vaccinations");
                 });
 
             modelBuilder.Entity("VetKlinik.Models.Veterinarian", b =>

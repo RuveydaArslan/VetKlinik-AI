@@ -1,4 +1,5 @@
-﻿@* Navbar'ın sağındaki giriş/çıkış bölümü *@
+﻿@* Navbar'ın sağındaki giriş/çıkış bölümü.
+   asp-area="" önemli: Admin/Vet panelindeyken linkler /Admin/Account/... adresine gitmesin. *@
 @inject SignInManager<ApplicationUser> SignInManager
 
 <ul class="navbar-nav align-items-sm-center">
@@ -8,7 +9,7 @@
             <span class="nav-link">👤 @User.Identity?.Name</span>
         </li>
         <li class="nav-item">
-            <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+            <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
                 <button type="submit" class="btn btn-sm btn-outline-light ms-sm-2">Çıkış Yap</button>
             </form>
         </li>
@@ -16,10 +17,10 @@
     else
     {
         <li class="nav-item">
-            <a class="nav-link" asp-controller="Account" asp-action="Login">Giriş Yap</a>
+            <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Login">Giriş Yap</a>
         </li>
         <li class="nav-item">
-            <a class="btn btn-sm btn-light text-vet fw-semibold ms-sm-2" asp-controller="Account" asp-action="Register">Kayıt Ol</a>
+            <a class="btn btn-sm btn-light text-vet fw-semibold ms-sm-2" asp-area="" asp-controller="Account" asp-action="Register">Kayıt Ol</a>
         </li>
     }
 </ul>

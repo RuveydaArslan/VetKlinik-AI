@@ -1,0 +1,104 @@
+﻿@model List<Pet>
+@{
+    ViewData["Title"] = "Panelim";
+    var randevular = (List<Appointment>)ViewBag.YaklasanRandevular;
+    var bugun = DateOnly.FromDateTime(DateTime.Today);
+}
+
+<div class="mb-4">
+    <h1 class="h3 mb-0 text-vet fw-bold">Panelim</h1>
+    <p class="text-muted mb-0">Evcil dostlarınızın özeti</p>
+</div>
+
+<!-- Evcil hayvanlar -->
+<h2 class="h5 fw-semibold mb-3">Evcil Hayvanlarım</h2>
+@if (!Model.Any())
+{
+    <div class="alert alert-light border">Henüz kayıtlı evcil hayvanınız yok.</div>
+}
+else
+{
+    <div class="row g-3 mb-4">
+        @foreach (var p in Model)
+        {
+            // Sonraki doz tarihi geçmiş veya 30 gün içinde olan aşılar
+            var dikkatAsilar = p.Vaccinations
+                .Where(v => v.NextDoseDate.HasValue && v.NextDoseDate.Value <= bugun.AddDays(30))
+                .OrderBy(v => v.NextDoseDate)
+                .ToList();
+
+            <div class="col-md-6 col-lg-4">
+                <div class="card border-0 shadow-sm h-100 pet-card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="pet-avatar me-3">@(p.Species == "Kedi" ? "🐱" : p.Species == "Köpek" ? "🐶" : "🐾")</div>
+                            <div>
+                                <h3 class="h5 mb-0">@p.Name</h3>
+                                <small class="text-muted">@p.Species @(string.IsNullOrEmpty(p.Breed) ? "" : "· " + p.Breed)</small>
+                            </div>
+                        </div>
+                        <p class="small text-muted mb-2">
+                            Doğum: @p.BirthDate.ToString("dd.MM.yyyy") · @p.Weight.ToString("0.##") kg
+                        </p>
+
+                        @if (dikkatAsilar.Any())
+                        {
+                            <div class="small fw-semibold mb-1">Yaklaşan / geciken aşılar</div>
+                            @foreach (var a in dikkatAsilar)
+                            {
+                                var gecikti = a.NextDoseDate!.Value < bugun;
+                                <div class="d-flex justify-content-between small">
+                                    <span>@a.VaccineName</span>
+                                    <span class="badge @(gecikti ? "bg-danger" : "bg-warning text-dark")">
+                                        @a.NextDoseDate.Value.ToString("dd.MM.yyyy") @(gecikti ? "(gecikti)" : "")
+                                    </span>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="small text-success">✔ Yakın zamanda aşısı yok</div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+<!-- Yaklaşan randevular -->
+<h2 class="h5 fw-semibold mb-3">Yaklaşan Randevularım</h2>
+@if (!randevular.Any())
+{
+    <div class="alert alert-light border">Yaklaşan randevunuz yok.</div>
+}
+else
+{
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Tarih / Saat</th>
+                        <th>Evcil Hayvan</th>
+                        <th>Hizmet</th>
+                        <th>Veteriner</th>
+                        <th>Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in randevular)
+                    {
+                        <tr>
+                            <td>@r.StartTime.ToString("dd.MM.yyyy HH:mm")</td>
+                            <td>@r.Pet?.Name</td>
+                            <td>@r.Service?.Name</td>
+                            <td>@r.Veterinarian?.Title @r.Veterinarian?.FullName</td>
+                            <td><span class="badge @r.Status.RozetSinifi()">@r.Status.GorunenAd()</span></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

@@ -24,9 +24,45 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Ana Sayfa</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">Gizlilik</a>
-                        </li>
+
+                        @* ---------- Rol bazlı menü ---------- *@
+                        @if (User.IsInRole(Roles.Admin))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Yönetim</a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">📊 Yönetim Paneli</a></li>
+                                    <li><hr class="dropdown-divider" /></li>
+                                    @* Aşağıdaki sayfalar ilerleyen günlerde eklenecek *@
+                                    <li><span class="dropdown-item disabled">🏥 Klinikler</span></li>
+                                    <li><span class="dropdown-item disabled">💉 Hizmetler</span></li>
+                                    <li><span class="dropdown-item disabled">🎓 Uzmanlık Alanları</span></li>
+                                    <li><span class="dropdown-item disabled">🩺 Veterinerler</span></li>
+                                    <li><span class="dropdown-item disabled">📅 Randevular</span></li>
+                                </ul>
+                            </li>
+                        }
+                        else if (User.IsInRole(Roles.Veteriner))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="Vet" asp-controller="Dashboard" asp-action="Index">Veteriner Paneli</a>
+                            </li>
+                            <li class="nav-item">
+                                <span class="nav-link disabled">Randevularım</span>
+                            </li>
+                        }
+                        else if (User.IsInRole(Roles.Uye))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Panel" asp-action="Index">Panelim</a>
+                            </li>
+                            <li class="nav-item">
+                                <span class="nav-link disabled">Evcil Hayvanlarım</span>
+                            </li>
+                            <li class="nav-item">
+                                <span class="nav-link disabled">Randevu Al</span>
+                            </li>
+                        }
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>
