@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VetKlinik.Data;
 using VetKlinik.Models;
+using VetKlinik.Services;
 
 namespace VetKlinik.Controllers
 {
@@ -11,24 +12,21 @@ namespace VetKlinik.Controllers
     [Authorize(Roles = Roles.Uye)] // sadece Üye rolündekiler girebilir
     public class PanelController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IPetService _petService;
+        private readonly ApplicationDbContext _context; // randevu sorgusu Gün 7'de AppointmentService'e taşınacak
 
-        public PanelController(ApplicationDbContext context)
+        public PanelController(IPetService petService, ApplicationDbContext context)
         {
+            _petService = petService;
             _context = context;
         }
 
         public async Task<IActionResult> Index()
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
-            // ÖNEMLİ: sadece giriş yapan kullanıcının (OwnerId) hayvanları getirilir.
-            // Başka üyelerin hayvanları bu sorguya hiçbir zaman girmez.
-            var hayvanlar = await _context.Pets
-                .Where(p => p.OwnerId == userId)
-                .Include(p => p.Vaccinations)
-                .OrderBy(p => p.Name)
-                .ToListAsync();
+            // Servis sadece giriş yapan kullanıcının (OwnerId) hayvanlarını döndürür
+            var hayvanlar = await _petService.GetByOwnerAsync(userId);
 
             var yaklasanRandevular = await _context.Appointments
                 .Include(a => a.Pet)

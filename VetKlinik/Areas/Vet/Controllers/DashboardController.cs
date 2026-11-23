@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VetKlinik.Data;
 using VetKlinik.Models;
+using VetKlinik.Services;
 
 namespace VetKlinik.Areas.Vet.Controllers
 {
@@ -12,10 +13,12 @@ namespace VetKlinik.Areas.Vet.Controllers
     [Authorize(Roles = Roles.Veteriner)] // sadece Veteriner rolündekiler girebilir
     public class DashboardController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IVetService _vetService;
+        private readonly ApplicationDbContext _context; // randevu sorgusu Gün 7'de AppointmentService'e taşınacak
 
-        public DashboardController(ApplicationDbContext context)
+        public DashboardController(IVetService vetService, ApplicationDbContext context)
         {
+            _vetService = vetService;
             _context = context;
         }
 
@@ -25,11 +28,7 @@ namespace VetKlinik.Areas.Vet.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             // Bu kullanıcı hesabına bağlı hekim kaydı
-            var hekim = await _context.Veterinarians
-                .Include(v => v.Clinic)
-                .Include(v => v.Specialties)
-                .Include(v => v.Availabilities)
-                .FirstOrDefaultAsync(v => v.UserId == userId);
+            var hekim = await _vetService.GetByUserIdAsync(userId!);
 
             if (hekim == null)
             {

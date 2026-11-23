@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using VetKlinik.Data;
 using VetKlinik.Models;
+using VetKlinik.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,6 +43,15 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.LogoutPath = "/Account/Logout";
     options.AccessDeniedPath = "/Account/AccessDenied";
 });
+
+// Servis katmanı: iş kuralları tek yerde yazılır.
+// MVC controller'ları, REST API ve MCP araçları bu servisleri kullanır.
+// AddScoped: her HTTP isteği için bir örnek oluşturulur (DbContext ile aynı ömür).
+builder.Services.AddScoped<IClinicService, ClinicService>();
+builder.Services.AddScoped<IServiceCatalogService, ServiceCatalogService>();
+builder.Services.AddScoped<ISpecialtyService, SpecialtyService>();
+builder.Services.AddScoped<IVetService, VetService>();
+builder.Services.AddScoped<IPetService, PetService>();
 
 builder.Services.AddControllersWithViews();
 
