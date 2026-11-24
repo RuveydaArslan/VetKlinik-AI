@@ -16,4 +16,18 @@
         public static IslemSonucu Basari(string mesaj = "İşlem başarıyla tamamlandı.") => new(true, mesaj);
         public static IslemSonucu Hata(string mesaj) => new(false, mesaj);
     }
+
+    // Başarılıysa bir veri de döndüren sürüm (ör. oluşturulan randevu)
+    public class IslemSonucu<T> : IslemSonucu
+    {
+        public T? Veri { get; }
+
+        private IslemSonucu(bool basarili, string mesaj, T? veri) : base(basarili, mesaj)
+        {
+            Veri = veri;
+        }
+
+        public static IslemSonucu<T> Basari(T veri, string mesaj) => new(true, mesaj, veri);
+        public new static IslemSonucu<T> Hata(string mesaj) => new(false, mesaj, default);
+    }
 }

@@ -52,6 +52,7 @@ builder.Services.AddScoped<IServiceCatalogService, ServiceCatalogService>();
 builder.Services.AddScoped<ISpecialtyService, SpecialtyService>();
 builder.Services.AddScoped<IVetService, VetService>();
 builder.Services.AddScoped<IPetService, PetService>();
+builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 
 builder.Services.AddControllersWithViews();
 

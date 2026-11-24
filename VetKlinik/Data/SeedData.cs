@@ -203,12 +203,17 @@ namespace VetKlinik.Data
                 CreatedAt = gecmis.EndTime
             };
 
-            // 2) Gelecekte onay bekleyen bir aşı randevusu
-            var gelecekGun = SonrakiIsGunu(DateTime.Today.AddDays(1));
+            // 2) Gelecekte onaylanmış bir muayene (Karabaş, ~3 gün sonra)
+            var onayliGun = SonrakiIsGunu(DateTime.Today.AddDays(3));
+            var onayli = RandevuOlustur(karabas, ayse, muayene, onayliGun.AddHours(10), AppointmentStatus.Onaylandi);
+
+            // 3) Gelecekte onay bekleyen bir aşı randevusu (Pamuk, ~1 hafta sonra)
+            //    Seed sadece ilk çalıştırmada çalışır; bu yüzden tarihler birkaç gün ileri verildi.
+            var gelecekGun = SonrakiIsGunu(DateTime.Today.AddDays(7));
             var bekleyen = RandevuOlustur(pamuk, ayse, asi, gelecekGun.AddHours(14), AppointmentStatus.Bekliyor);
             bekleyen.OwnerNote = "Kuduz aşısının hatırlatma dozu için.";
 
-            context.Appointments.AddRange(gecmis, bekleyen);
+            context.Appointments.AddRange(gecmis, onayli, bekleyen);
 
             await context.SaveChangesAsync();
         }

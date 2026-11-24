@@ -1,9 +1,7 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using VetKlinik.Data;
-using VetKlinik.Models;
 using VetKlinik.Services;
 
 namespace VetKlinik.Areas.Vet.Controllers
@@ -14,22 +12,21 @@ namespace VetKlinik.Areas.Vet.Controllers
     public class DashboardController : Controller
     {
         private readonly IVetService _vetService;
-        private readonly ApplicationDbContext _context; // randevu sorgusu Gün 7'de AppointmentService'e taşınacak
+        private readonly IAppointmentService _appointmentService;
 
-        public DashboardController(IVetService vetService, ApplicationDbContext context)
+        public DashboardController(IVetService vetService, IAppointmentService appointmentService)
         {
             _vetService = vetService;
-            _context = context;
+            _appointmentService = appointmentService;
         }
 
         public async Task<IActionResult> Index()
         {
             // Giriş yapan kullanıcının Id'si
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
             // Bu kullanıcı hesabına bağlı hekim kaydı
-            var hekim = await _vetService.GetByUserIdAsync(userId!);
-
+            var hekim = await _vetService.GetByUserIdAsync(userId);
             if (hekim == null)
             {
                 // Veteriner rolünde ama henüz bir hekim kaydına bağlanmamış hesap
@@ -37,14 +34,7 @@ namespace VetKlinik.Areas.Vet.Controllers
             }
 
             // Yalnızca BU hekimin bugünden itibaren aktif (bekleyen/onaylı) randevuları
-            var yaklasanRandevular = await _context.Appointments
-                .Include(a => a.Pet)
-                .Include(a => a.Service)
-                .Where(a => a.VeterinarianId == hekim.Id
-                         && a.StartTime >= DateTime.Today
-                         && (a.Status == AppointmentStatus.Bekliyor || a.Status == AppointmentStatus.Onaylandi))
-                .OrderBy(a => a.StartTime)
-                .ToListAsync();
+            var yaklasanRandevular = await _appointmentService.GetForVetAsync(hekim.Id, sadeceYaklasan: true);
 
             ViewBag.Hekim = hekim;
             return View(yaklasanRandevular);
