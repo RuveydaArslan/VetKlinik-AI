@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Reflection;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using VetKlinik.Models;
 
 namespace VetKlinik.Helpers
@@ -38,5 +39,23 @@ namespace VetKlinik.Helpers
             DayOfWeek.Sunday    => "Pazar",
             _ => gun.ToString()
         };
+
+        // Haftanın günleri Pazartesi'den başlayarak, Türkçe adlarıyla (açılır liste için)
+        public static List<SelectListItem> GunSecenekleri(DayOfWeek? secili = null)
+        {
+            return HaftaninGunleri()
+                .Select(g => new SelectListItem(g.TurkceAd(), ((int)g).ToString(), g == secili))
+                .ToList();
+        }
+
+        // Pazartesi, Salı, ..., Pazar sırası (DayOfWeek enum'u Pazar'dan başlar)
+        public static IEnumerable<DayOfWeek> HaftaninGunleri()
+        {
+            for (var i = 1; i <= 7; i++)
+                yield return (DayOfWeek)(i % 7);
+        }
+
+        // Listeleri Pazartesi'den başlayarak sıralamak için anahtar (Pazartesi=0 ... Pazar=6)
+        public static int HaftaSirasi(this DayOfWeek gun) => ((int)gun + 6) % 7;
     }
 }

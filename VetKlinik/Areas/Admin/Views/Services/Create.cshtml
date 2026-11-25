@@ -1,0 +1,22 @@
+﻿@model Service
+@{
+    ViewData["Title"] = "Yeni Hizmet";
+}
+
+<h1 class="h3 text-vet fw-bold mb-4">Yeni Hizmet</h1>
+
+<div class="card border-0 shadow-sm form-card">
+    <div class="card-body">
+        <form asp-action="Create" method="post">
+            <partial name="_Form" model="Model" />
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-vet">Kaydet</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Vazgeç</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -20,8 +20,6 @@
             <p class="text-muted mb-4">Yeni bir hesap oluşturun</p>
 
             <form asp-action="Register" method="post">
-                <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2" role="alert"></div>
-
                 <div class="form-floating mb-3">
                     <input asp-for="FullName" class="form-control" placeholder="Ad Soyad" autocomplete="name" />
                     <label asp-for="FullName"></label>

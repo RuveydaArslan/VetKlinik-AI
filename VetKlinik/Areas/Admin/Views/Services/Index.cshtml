@@ -1,0 +1,58 @@
+﻿@model List<Service>
+@{
+    ViewData["Title"] = "Hizmetler";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-0 text-vet fw-bold">💉 Hizmetler</h1>
+        <p class="text-muted mb-0">Kliniklerde sunulan hizmetler, süre ve ücretleri</p>
+    </div>
+    <a asp-action="Create" class="btn btn-vet">+ Yeni Hizmet</a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-light border">Henüz hizmet eklenmemiş.</div>
+}
+else
+{
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Hizmet</th>
+                        <th>Klinik</th>
+                        <th class="text-end">Süre</th>
+                        <th class="text-end">Ücret</th>
+                        <th>Durum</th>
+                        <th class="text-end">İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var s in Model)
+                    {
+                        <tr class="@(s.IsActive ? "" : "text-muted")">
+                            <td>
+                                <div class="fw-semibold">@s.Name</div>
+                                <div class="small text-muted">@s.Description</div>
+                            </td>
+                            <td>@s.Clinic?.Name</td>
+                            <td class="text-end">@s.DurationMinutes dk</td>
+                            <td class="text-end">@s.Price.ToString("N2") ₺</td>
+                            <td>
+                                @if (s.IsActive) { <span class="badge bg-success">Aktif</span> }
+                                else { <span class="badge bg-secondary">Pasif</span> }
+                            </td>
+                            <td class="text-end text-nowrap">
+                                <a asp-action="Edit" asp-route-id="@s.Id" class="btn btn-sm btn-outline-primary">Düzenle</a>
+                                <a asp-action="Delete" asp-route-id="@s.Id" class="btn btn-sm btn-outline-danger">Sil</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

@@ -1,0 +1,28 @@
+﻿@model Veterinarian
+@{
+    ViewData["Title"] = "Veteriner Sil";
+}
+
+<h1 class="h3 text-danger fw-bold mb-4">Veteriner Sil</h1>
+
+<div class="card border-0 shadow-sm form-card">
+    <div class="card-body">
+        <p class="mb-3">Aşağıdaki veterineri silmek istediğinize emin misiniz?</p>
+        <dl class="row mb-4">
+            <dt class="col-sm-4">Veteriner</dt><dd class="col-sm-8">@Model.Title @Model.FullName</dd>
+            <dt class="col-sm-4">Klinik</dt><dd class="col-sm-8">@Model.Clinic?.Name</dd>
+            <dt class="col-sm-4">Uzmanlık / Hizmet</dt><dd class="col-sm-8">@Model.Specialties.Count uzmanlık, @Model.Services.Count hizmet</dd>
+            <dt class="col-sm-4">Giriş Hesabı</dt><dd class="col-sm-8">@(Model.User?.Email ?? "—")</dd>
+        </dl>
+        <div class="alert alert-light border small">
+            Bu veterinere ait randevu varsa silme işlemi yapılmaz (randevu geçmişi korunur);
+            bunun yerine veterineri <strong>pasif</strong> yapabilirsiniz. Giriş hesabı silinmez, sadece bağlantı kalkar.
+        </div>
+
+        <form asp-action="Delete" method="post">
+            <input type="hidden" asp-for="Id" />
+            <button type="submit" class="btn btn-danger">Evet, Sil</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">Vazgeç</a>
+        </form>
+    </div>
+</div>

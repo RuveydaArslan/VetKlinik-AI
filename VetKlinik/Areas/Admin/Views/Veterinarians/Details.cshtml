@@ -1,0 +1,133 @@
+﻿@model Veterinarian
+@{
+    ViewData["Title"] = Model.FullName;
+    var randevular = (List<Appointment>)ViewBag.YaklasanRandevular;
+}
+
+<div class="d-flex justify-content-between align-items-start mb-4">
+    <div>
+        <h1 class="h3 mb-0 text-vet fw-bold">
+            @Model.Title @Model.FullName
+            @if (!Model.IsActive) { <span class="badge bg-secondary fs-6 align-middle">Pasif</span> }
+        </h1>
+        <p class="text-muted mb-0">
+            @Model.Clinic?.Name @(string.IsNullOrEmpty(Model.Phone) ? "" : "· " + Model.Phone)
+            · Giriş hesabı: @(Model.User?.Email ?? "bağlı değil")
+        </p>
+    </div>
+    <div class="text-nowrap">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-primary">Düzenle</a>
+        <a asp-action="Index" class="btn btn-outline-secondary">Listeye Dön</a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Sol: müsaitlik saatleri -->
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white fw-semibold">🕘 Müsaitlik Saatleri</div>
+            <div class="card-body p-0">
+                <table class="table align-middle mb-0">
+                    <tbody>
+                        @foreach (var gun in GorunumYardimcilari.HaftaninGunleri())
+                        {
+                            var araliklar = Model.Availabilities.Where(a => a.Day == gun).OrderBy(a => a.StartTime).ToList();
+                            <tr>
+                                <td class="fw-semibold" style="width:30%">@gun.TurkceAd()</td>
+                                <td>
+                                    @if (!araliklar.Any())
+                                    {
+                                        <span class="text-muted fst-italic">Çalışmıyor</span>
+                                    }
+                                    @foreach (var a in araliklar)
+                                    {
+                                        <div class="d-flex align-items-center justify-content-between py-1">
+                                            <span>@a.StartTime.ToString("HH:mm") – @a.EndTime.ToString("HH:mm")</span>
+                                            <form asp-action="DeleteAvailability" method="post" class="d-inline"
+                                                  onsubmit="return confirm('Bu müsaitlik aralığı silinsin mi?');">
+                                                <input type="hidden" name="id" value="@a.Id" />
+                                                <input type="hidden" name="veterinarianId" value="@Model.Id" />
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">Sil</button>
+                                            </form>
+                                        </div>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm mt-3">
+            <div class="card-header bg-white fw-semibold">Müsaitlik Ekle</div>
+            <div class="card-body">
+                <p class="small text-muted">Aralık, kliniğin o günkü çalışma saatleri içinde olmalı ve aynı gündeki başka bir aralıkla çakışmamalıdır.
+                    Hayvan sahipleri yalnızca bu aralıklara randevu alabilir.</p>
+                <form asp-action="AddAvailability" method="post" class="row g-2 align-items-end">
+                    <input type="hidden" name="VeterinarianId" value="@Model.Id" />
+                    <div class="col-sm-4">
+                        <label class="form-label small">Gün</label>
+                        <select name="Day" class="form-select" asp-items="GorunumYardimcilari.GunSecenekleri()"></select>
+                    </div>
+                    <div class="col-sm-3">
+                        <label class="form-label small">Başlangıç</label>
+                        <input type="time" name="StartTime" class="form-control" value="09:00" required />
+                    </div>
+                    <div class="col-sm-3">
+                        <label class="form-label small">Bitiş</label>
+                        <input type="time" name="EndTime" class="form-control" value="17:00" required />
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="submit" class="btn btn-vet w-100">Ekle</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sağ: uzmanlıklar, hizmetler, yaklaşan randevular -->
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white fw-semibold">🎓 Uzmanlık Alanları</div>
+            <div class="card-body">
+                @foreach (var u in Model.Specialties.OrderBy(s => s.Name))
+                {
+                    <span class="badge rounded-pill bg-vet me-1 mb-1">@u.Name</span>
+                }
+                @if (!Model.Specialties.Any()) { <span class="text-muted">Yok</span> }
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white fw-semibold">💉 Verebildiği Hizmetler</div>
+            <ul class="list-group list-group-flush">
+                @foreach (var h in Model.Services.OrderBy(s => s.Name))
+                {
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>@h.Name</span>
+                        <span class="text-muted small">@h.DurationMinutes dk · @h.Price.ToString("N2") ₺</span>
+                    </li>
+                }
+                @if (!Model.Services.Any()) { <li class="list-group-item text-muted">Yok</li> }
+            </ul>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white fw-semibold">📅 Yaklaşan Randevular</div>
+            <ul class="list-group list-group-flush">
+                @foreach (var r in randevular)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>
+                            <span class="fw-semibold">@r.StartTime.ToString("dd.MM.yyyy HH:mm")</span><br />
+                            <span class="small text-muted">@r.Pet?.Name · @r.Service?.Name</span>
+                        </span>
+                        <span class="badge @r.Status.RozetSinifi()">@r.Status.GorunenAd()</span>
+                    </li>
+                }
+                @if (!randevular.Any()) { <li class="list-group-item text-muted">Yaklaşan randevu yok.</li> }
+            </ul>
+        </div>
+    </div>
+</div>

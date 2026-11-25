@@ -1,0 +1,66 @@
+﻿@model List<Veterinarian>
+@{
+    ViewData["Title"] = "Veterinerler";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-0 text-vet fw-bold">🩺 Veterinerler</h1>
+        <p class="text-muted mb-0">Kliniklerde görev yapan veteriner hekimler</p>
+    </div>
+    <a asp-action="Create" class="btn btn-vet">+ Yeni Veteriner</a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-light border">Henüz veteriner eklenmemiş.</div>
+}
+else
+{
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Veteriner</th>
+                        <th>Klinik</th>
+                        <th>Uzmanlık Alanları</th>
+                        <th class="text-center">Hizmet</th>
+                        <th>Giriş Hesabı</th>
+                        <th>Durum</th>
+                        <th class="text-end">İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var v in Model)
+                    {
+                        <tr class="@(v.IsActive ? "" : "text-muted")">
+                            <td>
+                                <div class="fw-semibold">@v.FullName</div>
+                                <div class="small text-muted">@v.Title</div>
+                            </td>
+                            <td class="small">@v.Clinic?.Name</td>
+                            <td>
+                                @foreach (var u in v.Specialties.OrderBy(s => s.Name))
+                                {
+                                    <span class="badge rounded-pill bg-light text-dark border me-1 mb-1">@u.Name</span>
+                                }
+                            </td>
+                            <td class="text-center">@v.Services.Count</td>
+                            <td class="small">@(v.User?.Email ?? "—")</td>
+                            <td>
+                                @if (v.IsActive) { <span class="badge bg-success">Aktif</span> }
+                                else { <span class="badge bg-secondary">Pasif</span> }
+                            </td>
+                            <td class="text-end text-nowrap">
+                                <a asp-action="Details" asp-route-id="@v.Id" class="btn btn-sm btn-outline-secondary">Detay / Saatler</a>
+                                <a asp-action="Edit" asp-route-id="@v.Id" class="btn btn-sm btn-outline-primary">Düzenle</a>
+                                <a asp-action="Delete" asp-route-id="@v.Id" class="btn btn-sm btn-outline-danger">Sil</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

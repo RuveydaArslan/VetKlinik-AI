@@ -1,2 +1,18 @@
 ﻿<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
 <script src="~/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"></script>
+<script>
+    // İstemci tarafı doğrulama varsayılan olarak "500.50" (nokta) bekler.
+    // Türkçe'de ondalık ayırıcı virgül olduğu için "500,50" girişini de kabul ettiriyoruz.
+    (function () {
+        function sayiyaCevir(deger) {
+            return parseFloat(String(deger).replace(/\./g, "").replace(",", "."));
+        }
+        $.validator.methods.number = function (value, element) {
+            return this.optional(element) || /^-?(\d+|\d{1,3}(\.\d{3})+)(,\d+)?$/.test(value);
+        };
+        $.validator.methods.range = function (value, element, param) {
+            var s = sayiyaCevir(value);
+            return this.optional(element) || (s >= param[0] && s <= param[1]);
+        };
+    })();
+</script>

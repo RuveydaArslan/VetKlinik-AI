@@ -1,0 +1,27 @@
+﻿@model Service
+@{
+    ViewData["Title"] = "Hizmet Sil";
+}
+
+<h1 class="h3 text-danger fw-bold mb-4">Hizmet Sil</h1>
+
+<div class="card border-0 shadow-sm form-card">
+    <div class="card-body">
+        <p class="mb-3">Aşağıdaki hizmeti silmek istediğinize emin misiniz?</p>
+        <dl class="row mb-4">
+            <dt class="col-sm-4">Hizmet</dt><dd class="col-sm-8">@Model.Name</dd>
+            <dt class="col-sm-4">Klinik</dt><dd class="col-sm-8">@Model.Clinic?.Name</dd>
+            <dt class="col-sm-4">Süre / Ücret</dt><dd class="col-sm-8">@Model.DurationMinutes dk · @Model.Price.ToString("N2") ₺</dd>
+            <dt class="col-sm-4">Veren Hekim</dt><dd class="col-sm-8">@Model.Veterinarians.Count</dd>
+        </dl>
+        <div class="alert alert-light border small">
+            Bu hizmete ait randevu varsa silme işlemi yapılmaz; bunun yerine hizmeti <strong>pasif</strong> yapabilirsiniz.
+        </div>
+
+        <form asp-action="Delete" method="post">
+            <input type="hidden" asp-for="Id" />
+            <button type="submit" class="btn btn-danger">Evet, Sil</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">Vazgeç</a>
+        </form>
+    </div>
+</div>

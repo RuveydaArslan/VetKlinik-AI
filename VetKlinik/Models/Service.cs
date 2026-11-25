@@ -7,6 +7,7 @@ namespace VetKlinik.Models
     {
         public int Id { get; set; }
 
+        [Required(ErrorMessage = "Lütfen bir klinik seçin.")]
         [Display(Name = "Klinik")]
         public int ClinicId { get; set; }
         public Clinic? Clinic { get; set; }
@@ -21,10 +22,12 @@ namespace VetKlinik.Models
         public string? Description { get; set; }
 
         // Randevu çakışma hesabında kullanılacak süre
+        [Required(ErrorMessage = "Süre zorunludur.")]
         [Range(5, 480, ErrorMessage = "Süre 5 ile 480 dakika arasında olmalıdır.")]
         [Display(Name = "Süre (dk)")]
         public int DurationMinutes { get; set; }
 
+        [Required(ErrorMessage = "Ücret zorunludur.")]
         [Range(0, 100000, ErrorMessage = "Ücret 0 ile 100.000 ₺ arasında olmalıdır.")]
         [DataType(DataType.Currency)]
         [Display(Name = "Ücret (₺)")]

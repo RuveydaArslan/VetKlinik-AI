@@ -14,8 +14,9 @@ namespace VetKlinik.Services
         // Belirli bir hizmeti verebilen aktif hekimler (randevu alırken kullanılır)
         Task<List<Veterinarian>> GetByServiceAsync(int serviceId);
 
-        Task<IslemSonucu> CreateAsync(Veterinarian hekim, IEnumerable<int> uzmanlikIdleri, IEnumerable<int> hizmetIdleri);
-        Task<IslemSonucu> UpdateAsync(Veterinarian hekim, IEnumerable<int> uzmanlikIdleri, IEnumerable<int> hizmetIdleri);
+        // yeniHesap verilirse Veteriner rolünde bir giriş hesabı oluşturulup hekime bağlanır
+        Task<IslemSonucu> CreateAsync(Veterinarian hekim, IEnumerable<int> uzmanlikIdleri, IEnumerable<int> hizmetIdleri, YeniHesap? yeniHesap = null);
+        Task<IslemSonucu> UpdateAsync(Veterinarian hekim, IEnumerable<int> uzmanlikIdleri, IEnumerable<int> hizmetIdleri, YeniHesap? yeniHesap = null);
         Task<IslemSonucu> DeleteAsync(int id);
 
         // Müsaitlik saatleri

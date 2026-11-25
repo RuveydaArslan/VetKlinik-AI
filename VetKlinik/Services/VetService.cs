@@ -24,6 +24,7 @@ namespace VetKlinik.Services
                 .Include(v => v.Clinic)
                 .Include(v => v.Specialties)
                 .Include(v => v.Services)
+                .Include(v => v.User)
                 .Where(v => !sadeceAktif || v.IsActive)
                 .OrderBy(v => v.FullName)
                 .ToListAsync();
@@ -61,14 +62,23 @@ namespace VetKlinik.Services
                 .ToListAsync();
         }
 
-        public async Task<IslemSonucu> CreateAsync(Veterinarian hekim, IEnumerable<int> uzmanlikIdleri, IEnumerable<int> hizmetIdleri)
+        public async Task<IslemSonucu> CreateAsync(Veterinarian hekim, IEnumerable<int> uzmanlikIdleri, IEnumerable<int> hizmetIdleri, YeniHesap? yeniHesap = null)
         {
             var uIdler = uzmanlikIdleri.ToList();
             var hIdler = hizmetIdleri.ToList();
 
-            var kontrol = await KontrolEtAsync(hekim, hIdler);
+            var kontrol = await KontrolEtAsync(hekim, hIdler, yeniHesap);
             if (!kontrol.Basarili)
                 return kontrol;
+
+            // Tüm kontroller geçtikten SONRA (gerekirse) giriş hesabını oluştur
+            if (yeniHesap != null)
+            {
+                var hesap = await HesapOlusturAsync(yeniHesap, hekim.FullName);
+                if (!hesap.Basarili)
+                    return hesap;
+                hekim.UserId = hesap.Veri!.Id;
+            }
 
             // Seçilen Id'lere karşılık gelen uzmanlık ve hizmetleri bağla (çoka-çok)
             hekim.Specialties = await _context.Specialties.Where(s => uIdler.Contains(s.Id)).ToListAsync();
@@ -79,7 +89,7 @@ namespace VetKlinik.Services
             return IslemSonucu.Basari($"{hekim.FullName} eklendi.");
         }
 
-        public async Task<IslemSonucu> UpdateAsync(Veterinarian hekim, IEnumerable<int> uzmanlikIdleri, IEnumerable<int> hizmetIdleri)
+        public async Task<IslemSonucu> UpdateAsync(Veterinarian hekim, IEnumerable<int> uzmanlikIdleri, IEnumerable<int> hizmetIdleri, YeniHesap? yeniHesap = null)
         {
             var mevcut = await _context.Veterinarians
                 .Include(v => v.Specialties)
@@ -91,9 +101,17 @@ namespace VetKlinik.Services
             var uIdler = uzmanlikIdleri.ToList();
             var hIdler = hizmetIdleri.ToList();
 
-            var kontrol = await KontrolEtAsync(hekim, hIdler);
+            var kontrol = await KontrolEtAsync(hekim, hIdler, yeniHesap);
             if (!kontrol.Basarili)
                 return kontrol;
+
+            if (yeniHesap != null)
+            {
+                var hesap = await HesapOlusturAsync(yeniHesap, hekim.FullName);
+                if (!hesap.Basarili)
+                    return hesap;
+                hekim.UserId = hesap.Veri!.Id;
+            }
 
             mevcut.ClinicId = hekim.ClinicId;
             mevcut.FullName = hekim.FullName;
@@ -196,8 +214,14 @@ namespace VetKlinik.Services
         }
 
         // Ekleme ve güncellemede ortak kontroller
-        private async Task<IslemSonucu> KontrolEtAsync(Veterinarian hekim, IEnumerable<int> hizmetIdleri)
+        private async Task<IslemSonucu> KontrolEtAsync(Veterinarian hekim, IEnumerable<int> hizmetIdleri, YeniHesap? yeniHesap = null)
         {
+            if (yeniHesap != null && !string.IsNullOrEmpty(hekim.UserId))
+                return IslemSonucu.Hata("Hem mevcut bir hesap seçip hem de yeni hesap oluşturamazsınız. Birini seçin.");
+
+            if (yeniHesap != null && await _userManager.FindByEmailAsync(yeniHesap.Email) != null)
+                return IslemSonucu.Hata($"'{yeniHesap.Email}' e-posta adresiyle kayıtlı bir hesap zaten var.");
+
             if (!await _context.Clinics.AnyAsync(c => c.Id == hekim.ClinicId))
                 return IslemSonucu.Hata("Seçilen klinik bulunamadı.");
 
@@ -225,6 +249,26 @@ namespace VetKlinik.Services
             }
 
             return IslemSonucu.Basari();
+        }
+
+        // Veteriner rolünde yeni bir giriş hesabı oluşturur
+        private async Task<IslemSonucu<ApplicationUser>> HesapOlusturAsync(YeniHesap yeniHesap, string adSoyad)
+        {
+            var kullanici = new ApplicationUser
+            {
+                UserName = yeniHesap.Email,
+                Email = yeniHesap.Email,
+                FullName = adSoyad,
+                EmailConfirmed = true
+            };
+
+            var sonuc = await _userManager.CreateAsync(kullanici, yeniHesap.Sifre);
+            if (!sonuc.Succeeded)
+                return IslemSonucu<ApplicationUser>.Hata(
+                    "Giriş hesabı oluşturulamadı: " + string.Join(" ", sonuc.Errors.Select(e => e.Description)));
+
+            await _userManager.AddToRoleAsync(kullanici, Roles.Veteriner);
+            return IslemSonucu<ApplicationUser>.Basari(kullanici, "Hesap oluşturuldu.");
         }
     }
 }

@@ -34,10 +34,10 @@
                                     <li><a class="dropdown-item" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">📊 Yönetim Paneli</a></li>
                                     <li><hr class="dropdown-divider" /></li>
                                     @* Aşağıdaki sayfalar ilerleyen günlerde eklenecek *@
-                                    <li><span class="dropdown-item disabled">🏥 Klinikler</span></li>
-                                    <li><span class="dropdown-item disabled">💉 Hizmetler</span></li>
-                                    <li><span class="dropdown-item disabled">🎓 Uzmanlık Alanları</span></li>
-                                    <li><span class="dropdown-item disabled">🩺 Veterinerler</span></li>
+                                    <li><a class="dropdown-item" asp-area="Admin" asp-controller="Clinics" asp-action="Index">🏥 Klinikler</a></li>
+                                    <li><a class="dropdown-item" asp-area="Admin" asp-controller="Services" asp-action="Index">💉 Hizmetler</a></li>
+                                    <li><a class="dropdown-item" asp-area="Admin" asp-controller="Specialties" asp-action="Index">🎓 Uzmanlık Alanları</a></li>
+                                    <li><a class="dropdown-item" asp-area="Admin" asp-controller="Veterinarians" asp-action="Index">🩺 Veterinerler</a></li>
                                     <li><span class="dropdown-item disabled">📅 Randevular</span></li>
                                 </ul>
                             </li>
@@ -71,17 +71,12 @@
     </header>
     <div class="container">
         <main role="main" class="pb-3">
-            @* İşlem sonrası başarı mesajı (TempData["Basari"]) *@
-            @if (TempData["Basari"] is string basari)
-            {
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    @basari
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Kapat"></button>
-                </div>
-            }
             @RenderBody()
         </main>
     </div>
+
+    @* Başarı / hata mesajları sayfanın ortasında küçük kutucuk olarak gösterilir *@
+    <partial name="_Bildirim" />
 
     <footer class="footer footer-vet">
         <div class="container">

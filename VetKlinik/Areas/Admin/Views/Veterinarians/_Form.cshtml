@@ -1,0 +1,124 @@
+﻿@model VetKlinik.ViewModels.VeterinerFormViewModel
+@* Create ve Edit sayfalarının ortak form alanları *@
+
+<div class="row g-4">
+    <!-- Sol: temel bilgiler -->
+    <div class="col-lg-6">
+        <h2 class="h6 fw-bold text-vet mb-3">Temel Bilgiler</h2>
+
+        <div class="mb-3">
+            <label asp-for="ClinicId" class="form-label"></label>
+            <select asp-for="ClinicId" asp-items="Model.Klinikler" class="form-select" id="klinikSecimi">
+                <option value="">-- Klinik seçin --</option>
+            </select>
+            <span asp-validation-for="ClinicId" class="text-danger small"></span>
+        </div>
+        <div class="row">
+            <div class="col-sm-4 mb-3">
+                <label asp-for="Title" class="form-label"></label>
+                <input asp-for="Title" class="form-control" placeholder="Vet. Hek." />
+                <span asp-validation-for="Title" class="text-danger small"></span>
+            </div>
+            <div class="col-sm-8 mb-3">
+                <label asp-for="FullName" class="form-label"></label>
+                <input asp-for="FullName" class="form-control" />
+                <span asp-validation-for="FullName" class="text-danger small"></span>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Phone" class="form-label"></label>
+            <input asp-for="Phone" class="form-control" placeholder="0532 000 00 00" />
+            <span asp-validation-for="Phone" class="text-danger small"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Biography" class="form-label"></label>
+            <textarea asp-for="Biography" class="form-control" rows="3"></textarea>
+            <span asp-validation-for="Biography" class="text-danger small"></span>
+        </div>
+        <div class="form-check mb-4">
+            <input asp-for="IsActive" class="form-check-input" />
+            <label asp-for="IsActive" class="form-check-label"></label>
+            <div class="form-text">Pasif hekimler için yeni randevu alınamaz.</div>
+        </div>
+
+        <h2 class="h6 fw-bold text-vet mb-2">Giriş Hesabı</h2>
+        <p class="small text-muted">Hekim, kendi randevularını görmek ve onaylamak için Veteriner rolünde bir hesapla giriş yapar.
+            Mevcut bir hesabı seçin <strong>veya</strong> yeni hesap oluşturun.</p>
+        <div class="mb-3">
+            <label asp-for="UserId" class="form-label"></label>
+            <select asp-for="UserId" asp-items="Model.Hesaplar" class="form-select">
+                <option value="">-- Hesap bağlama --</option>
+            </select>
+            <span asp-validation-for="UserId" class="text-danger small"></span>
+        </div>
+        <div class="row">
+            <div class="col-sm-7 mb-3">
+                <label asp-for="YeniHesapEmail" class="form-label"></label>
+                <input asp-for="YeniHesapEmail" class="form-control" placeholder="ad.soyad@vetklinik.com" autocomplete="off" />
+                <span asp-validation-for="YeniHesapEmail" class="text-danger small"></span>
+            </div>
+            <div class="col-sm-5 mb-3">
+                <label asp-for="YeniHesapSifre" class="form-label"></label>
+                <input asp-for="YeniHesapSifre" class="form-control" autocomplete="new-password" />
+                <span asp-validation-for="YeniHesapSifre" class="text-danger small"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sağ: uzmanlık ve hizmet seçimi (checkbox listeleri) -->
+    <div class="col-lg-6">
+        <h2 class="h6 fw-bold text-vet mb-3">Uzmanlık Alanları</h2>
+        <div class="secim-kutusu mb-4">
+            @foreach (var u in Model.TumUzmanliklar)
+            {
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="SecilenUzmanlikIdleri" value="@u.Id"
+                           id="uz-@u.Id" checked="@Model.SecilenUzmanlikIdleri.Contains(u.Id)" />
+                    <label class="form-check-label" for="uz-@u.Id">@u.Name</label>
+                </div>
+            }
+            @if (!Model.TumUzmanliklar.Any())
+            {
+                <span class="text-muted small">Önce uzmanlık alanı ekleyin.</span>
+            }
+        </div>
+
+        <h2 class="h6 fw-bold text-vet mb-1">Verebildiği Hizmetler</h2>
+        <p class="small text-muted mb-2">Sadece seçilen kliniğin hizmetleri listelenir.</p>
+        <div class="secim-kutusu">
+            @foreach (var h in Model.TumHizmetler)
+            {
+                <div class="form-check hizmet-secenegi" data-klinik="@h.ClinicId">
+                    <input class="form-check-input" type="checkbox" name="SecilenHizmetIdleri" value="@h.Id"
+                           id="hz-@h.Id" checked="@Model.SecilenHizmetIdleri.Contains(h.Id)" />
+                    <label class="form-check-label" for="hz-@h.Id">
+                        @h.Name <span class="text-muted small">(@h.DurationMinutes dk · @h.Price.ToString("N2") ₺)</span>
+                        @if (!h.IsActive) { <span class="badge bg-secondary">Pasif</span> }
+                    </label>
+                </div>
+            }
+            <span class="text-muted small" id="hizmetYok" style="display:none">Bu klinikte hizmet yok.</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Klinik değişince sadece o kliniğin hizmetlerini göster; başka klinikteki seçimleri kaldır.
+    // (Aynı kural sunucuda VetService içinde de kontrol ediliyor.)
+    document.addEventListener("DOMContentLoaded", function () {
+        var secim = document.getElementById("klinikSecimi");
+        function hizmetleriFiltrele() {
+            var klinikId = secim.value;
+            var gorunen = 0;
+            document.querySelectorAll(".hizmet-secenegi").forEach(function (satir) {
+                var ayniKlinik = satir.dataset.klinik === klinikId;
+                satir.style.display = ayniKlinik ? "" : "none";
+                if (!ayniKlinik) satir.querySelector("input").checked = false;
+                if (ayniKlinik) gorunen++;
+            });
+            document.getElementById("hizmetYok").style.display = (klinikId && gorunen === 0) ? "" : "none";
+        }
+        secim.addEventListener("change", hizmetleriFiltrele);
+        hizmetleriFiltrele();
+    });
+</script>

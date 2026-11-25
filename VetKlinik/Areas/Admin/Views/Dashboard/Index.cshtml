@@ -10,6 +10,15 @@
     </div>
 </div>
 
+<!-- Hızlı Erişim -->
+<div class="d-flex flex-wrap gap-2 mb-4">
+    <a asp-controller="Clinics" asp-action="Index" class="btn btn-outline-secondary">🏥 Klinikler</a>
+    <a asp-controller="Services" asp-action="Index" class="btn btn-outline-secondary">💉 Hizmetler</a>
+    <a asp-controller="Specialties" asp-action="Index" class="btn btn-outline-secondary">🎓 Uzmanlık Alanları</a>
+    <a asp-controller="Veterinarians" asp-action="Index" class="btn btn-outline-secondary">🩺 Veterinerler</a>
+    <a asp-controller="Veterinarians" asp-action="Create" class="btn btn-vet">+ Yeni Veteriner</a>
+</div>
+
 <!-- Özet kartları -->
 <div class="row g-3 mb-4">
     <div class="col-6 col-lg-3"><div class="stat-card"><div class="stat-icon">🏥</div><div class="stat-value">@ViewBag.KlinikSayisi</div><div class="stat-label">Klinik</div></div></div>

@@ -1,0 +1,31 @@
+﻿@model Clinic
+@{
+    ViewData["Title"] = "Klinik Sil";
+    var silinebilir = !Model.Services.Any() && !Model.Veterinarians.Any();
+}
+
+<h1 class="h3 text-danger fw-bold mb-4">Klinik Sil</h1>
+
+<div class="card border-0 shadow-sm form-card">
+    <div class="card-body">
+        <p class="mb-3">Aşağıdaki kliniği silmek istediğinize emin misiniz?</p>
+        <dl class="row mb-4">
+            <dt class="col-sm-4">Klinik Adı</dt><dd class="col-sm-8">@Model.Name</dd>
+            <dt class="col-sm-4">Adres</dt><dd class="col-sm-8">@Model.Address</dd>
+            <dt class="col-sm-4">Hizmet / Veteriner</dt><dd class="col-sm-8">@Model.Services.Count hizmet, @Model.Veterinarians.Count veteriner</dd>
+        </dl>
+
+        @if (!silinebilir)
+        {
+            <div class="alert alert-warning">
+                Bu kliniğe bağlı hizmet veya veteriner olduğu için silinemez. Önce onları kaldırın.
+            </div>
+        }
+
+        <form asp-action="Delete" method="post">
+            <input type="hidden" asp-for="Id" />
+            <button type="submit" class="btn btn-danger" disabled="@(!silinebilir)">Evet, Sil</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">Vazgeç</a>
+        </form>
+    </div>
+</div>

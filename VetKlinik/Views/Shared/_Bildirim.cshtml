@@ -1,0 +1,50 @@
+﻿@*
+    Sayfanın ORTASINDA çıkan küçük bildirim kutucukları.
+    Kaynakları:
+      - TempData["Basari"] / TempData["Hata"]: controller'da işlemden sonra (yönlendirmeyle) gönderilen mesajlar
+      - ModelState'teki alan dışı hatalar: servis kuralı ihlali (ör. "aynı isimde hizmet var") gibi form genel hataları
+    Alan hataları (ör. "Ad zorunludur") ilgili alanın altında gösterilmeye devam eder.
+    Kutucuklar birkaç saniye sonra kendiliğinden kapanır (wwwroot/js/site.js).
+*@
+@{
+    var basari = TempData["Basari"] as string;
+    var hatalar = new List<string>();
+
+    if (TempData["Hata"] is string tempHata)
+        hatalar.Add(tempHata);
+
+    if (ViewData.ModelState.TryGetValue(string.Empty, out var genelHatalar))
+        hatalar.AddRange(genelHatalar.Errors.Select(e => e.ErrorMessage));
+}
+
+@if (basari != null || hatalar.Any())
+{
+    <div class="bildirim-katman" aria-live="polite" aria-atomic="true">
+        @if (basari != null)
+        {
+            <div class="toast bildirim-toast bildirim-basari" role="status" data-bs-delay="3000">
+                <div class="toast-body">
+                    <div class="bildirim-ikon">✓</div>
+                    <div class="bildirim-metin">
+                        <div class="bildirim-baslik">İşlem başarılı</div>
+                        <div>@basari</div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Kapat"></button>
+                </div>
+            </div>
+        }
+        @foreach (var hata in hatalar.Distinct())
+        {
+            <div class="toast bildirim-toast bildirim-hata" role="alert" data-bs-delay="6000">
+                <div class="toast-body">
+                    <div class="bildirim-ikon">!</div>
+                    <div class="bildirim-metin">
+                        <div class="bildirim-baslik">İşlem yapılamadı</div>
+                        <div>@hata</div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Kapat"></button>
+                </div>
+            </div>
+        }
+    </div>
+}

@@ -1,0 +1,38 @@
+﻿@model Service
+@* Create ve Edit sayfalarının ortak form alanları *@
+
+<div class="mb-3">
+    <label asp-for="ClinicId" class="form-label"></label>
+    <select asp-for="ClinicId" asp-items="ViewBag.Klinikler" class="form-select">
+        <option value="">-- Klinik seçin --</option>
+    </select>
+    <span asp-validation-for="ClinicId" class="text-danger small"></span>
+</div>
+<div class="mb-3">
+    <label asp-for="Name" class="form-label"></label>
+    <input asp-for="Name" class="form-control" placeholder="ör. Genel Muayene" />
+    <span asp-validation-for="Name" class="text-danger small"></span>
+</div>
+<div class="mb-3">
+    <label asp-for="Description" class="form-label"></label>
+    <textarea asp-for="Description" class="form-control" rows="2"></textarea>
+    <span asp-validation-for="Description" class="text-danger small"></span>
+</div>
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <label asp-for="DurationMinutes" class="form-label"></label>
+        <input asp-for="DurationMinutes" class="form-control" min="5" max="480" step="5" />
+        <div class="form-text">Randevu çakışma hesabında bu süre kullanılır.</div>
+        <span asp-validation-for="DurationMinutes" class="text-danger small"></span>
+    </div>
+    <div class="col-md-6 mb-3">
+        <label asp-for="Price" class="form-label"></label>
+        <input asp-for="Price" class="form-control" placeholder="ör. 500,00" />
+        <span asp-validation-for="Price" class="text-danger small"></span>
+    </div>
+</div>
+<div class="form-check mb-3">
+    <input asp-for="IsActive" class="form-check-input" />
+    <label asp-for="IsActive" class="form-check-label"></label>
+    <div class="form-text">Pasif hizmetler için yeni randevu alınamaz.</div>
+</div>

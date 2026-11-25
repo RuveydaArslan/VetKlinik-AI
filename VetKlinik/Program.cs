@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.Globalization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using VetKlinik.Data;
 using VetKlinik.Models;
@@ -54,7 +56,22 @@ builder.Services.AddScoped<IVetService, VetService>();
 builder.Services.AddScoped<IPetService, PetService>();
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options =>
+{
+    // Model bağlama (form verisini C# nesnesine çevirme) hata mesajlarını Türkçeleştir
+    var m = options.ModelBindingMessageProvider;
+    m.SetValueMustNotBeNullAccessor(_ => "Bu alan zorunludur.");
+    m.SetMissingBindRequiredValueAccessor(alan => $"{alan} alanı zorunludur.");
+    m.SetMissingKeyOrValueAccessor(() => "Bir değer girilmesi zorunludur.");
+    m.SetMissingRequestBodyRequiredValueAccessor(() => "İstek gövdesi boş olamaz.");
+    m.SetAttemptedValueIsInvalidAccessor((deger, alan) => $"'{deger}' değeri {alan} için geçerli değil.");
+    m.SetNonPropertyAttemptedValueIsInvalidAccessor(deger => $"'{deger}' geçerli bir değer değil.");
+    m.SetUnknownValueIsInvalidAccessor(alan => $"{alan} için girilen değer geçersiz.");
+    m.SetNonPropertyUnknownValueIsInvalidAccessor(() => "Girilen değer geçersiz.");
+    m.SetValueIsInvalidAccessor(deger => $"'{deger}' geçerli bir değer değil.");
+    m.SetValueMustBeANumberAccessor(alan => $"{alan} alanı bir sayı olmalıdır.");
+    m.SetNonPropertyValueMustBeANumberAccessor(() => "Bu alan bir sayı olmalıdır.");
+});
 
 var app = builder.Build();
 
@@ -73,6 +90,17 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Uygulamanın kültürü her bilgisayarda Türkçe (tr-TR) olsun:
+// ondalık ayırıcı virgül (1.500,50), tarih biçimi gg.aa.yyyy.
+// Böylece formdaki "500,50" gibi ücretler doğru okunur.
+var trKultur = new CultureInfo("tr-TR");
+app.UseRequestLocalization(new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture(trKultur),
+    SupportedCultures = new[] { trKultur },
+    SupportedUICultures = new[] { trKultur }
+});
 app.UseRouting();
 
 app.UseAuthentication(); // kullanıcı kim? (giriş bilgisini okur)

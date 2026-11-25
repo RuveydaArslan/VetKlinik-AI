@@ -1,0 +1,29 @@
+﻿@model Specialty
+@{
+    ViewData["Title"] = "Uzmanlık Alanı Sil";
+    var silinebilir = !Model.Veterinarians.Any();
+}
+
+<h1 class="h3 text-danger fw-bold mb-4">Uzmanlık Alanı Sil</h1>
+
+<div class="card border-0 shadow-sm form-card">
+    <div class="card-body">
+        <p class="mb-3">Aşağıdaki uzmanlık alanını silmek istediğinize emin misiniz?</p>
+        <dl class="row mb-4">
+            <dt class="col-sm-4">Uzmanlık Alanı</dt><dd class="col-sm-8">@Model.Name</dd>
+            <dt class="col-sm-4">Açıklama</dt><dd class="col-sm-8">@Model.Description</dd>
+            <dt class="col-sm-4">Bu alana sahip hekim</dt><dd class="col-sm-8">@Model.Veterinarians.Count</dd>
+        </dl>
+
+        @if (!silinebilir)
+        {
+            <div class="alert alert-warning">Bu uzmanlık alanına sahip veterinerler olduğu için silinemez.</div>
+        }
+
+        <form asp-action="Delete" method="post">
+            <input type="hidden" asp-for="Id" />
+            <button type="submit" class="btn btn-danger" disabled="@(!silinebilir)">Evet, Sil</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">Vazgeç</a>
+        </form>
+    </div>
+</div>

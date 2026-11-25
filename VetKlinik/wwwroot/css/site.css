@@ -209,3 +209,109 @@ a {
 .navbar-vet .nav-link.disabled {
   color: rgba(255, 255, 255, .45);
 }
+
+/* ---------- Admin formları ---------- */
+.form-card {
+  max-width: 760px;
+}
+
+/* ---------- Ortada çıkan bildirim kutucukları ---------- */
+.bildirim-katman {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1090;
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+  pointer-events: none; /* arkadaki sayfaya tıklanabilsin */
+}
+
+.bildirim-toast {
+  pointer-events: auto;
+  width: 380px;
+  max-width: 90vw;
+  border: none;
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow: 0 1rem 3rem rgba(27, 31, 75, .25);
+  border-top: 5px solid var(--vet-mor);
+}
+
+.bildirim-toast.show {
+  animation: bildirimGiris .25s ease-out;
+}
+
+.bildirim-toast .toast-body {
+  display: flex;
+  align-items: center;
+  gap: .9rem;
+  padding: 1rem 1.1rem;
+}
+
+.bildirim-ikon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: #fff;
+}
+
+.bildirim-metin {
+  flex-grow: 1;
+  color: #333;
+}
+
+.bildirim-baslik {
+  font-weight: 700;
+  margin-bottom: .1rem;
+}
+
+.bildirim-basari {
+  border-top-color: #198754;
+}
+
+.bildirim-basari .bildirim-ikon {
+  background: #198754;
+}
+
+.bildirim-basari .bildirim-baslik {
+  color: #198754;
+}
+
+.bildirim-hata {
+  border-top-color: #dc3545;
+}
+
+.bildirim-hata .bildirim-ikon {
+  background: #dc3545;
+}
+
+.bildirim-hata .bildirim-baslik {
+  color: #dc3545;
+}
+
+@keyframes bildirimGiris {
+  from { transform: scale(.9); opacity: 0; }
+  to   { transform: scale(1);  opacity: 1; }
+}
+
+/* ---------- Checkbox seçim listeleri ---------- */
+.secim-kutusu {
+  background: var(--vet-zemin);
+  border-radius: .75rem;
+  padding: .75rem 1rem;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.secim-kutusu .form-check {
+  padding-top: .2rem;
+  padding-bottom: .2rem;
+}
